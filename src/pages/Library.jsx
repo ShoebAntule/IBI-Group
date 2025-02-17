@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { Book, Search } from 'lucide-react';
+import { useInView } from 'react-intersection-observer';
 
 const categories = ['Research Papers', 'Technical Documents', 'Case Studies', 'Industry Reports'];
 
@@ -84,27 +85,45 @@ const LibraryPage = () => {
 
             <div className="space-y-4">
               {documents.map((doc, index) => (
-                <motion.div
-                  key={doc.title}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  className="card-gradient p-6 rounded-xl"
-                >
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h3 className="text-lg font-semibold mb-2">{doc.title}</h3>
-                      <span className="text-sm text-blue-400">{doc.category}</span>
-                    </div>
-                    <span className="text-gray-400">{doc.date}</span>
-                  </div>
-                </motion.div>
+                <DocumentCard key={doc.title} doc={doc} index={index} />
               ))}
             </div>
           </motion.div>
         </div>
       </div>
     </div>
+  );
+};
+
+// Document Card Component
+const DocumentCard = ({ doc, index }) => {
+  const { ref, inView } = useInView({
+    threshold: 0.5, // Trigger when 50% of the element is visible
+  });
+
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{
+        opacity: inView ? 1 : 0,
+        y: inView ? 0 : 20,
+      }}
+      transition={{
+        delay: index * 0.1,
+        duration: 0.6,
+        ease: 'easeInOut',
+      }}
+      className="card-gradient p-6 rounded-xl"
+    >
+      <div className="flex justify-between items-start">
+        <div>
+          <h3 className="text-lg font-semibold mb-2">{doc.title}</h3>
+          <span className="text-sm text-blue-400">{doc.category}</span>
+        </div>
+        <span className="text-gray-400">{doc.date}</span>
+      </div>
+    </motion.div>
   );
 };
 

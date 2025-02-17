@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { useInView } from 'react-intersection-observer';
 import { Calendar, User, ArrowRight } from 'lucide-react';
 
 const posts = [
@@ -26,12 +27,31 @@ const posts = [
 ];
 
 const BlogPage = () => {
+  const { ref, inView } = useInView({
+    triggerOnce: false, // Trigger every time the element comes into view
+    threshold: 0.1, // Trigger when 50% of the element is visible
+  });
+
   return (
     <div className="pt-16">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+      <motion.div
+        initial="hidden"
+        animate={inView ? 'visible' : 'hidden'} // Animate based on visibility
+        variants={{
+          hidden: { opacity: 0, y: 20 },
+          visible: { opacity: 1, y: 0 },
+        }}
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20"
+      >
+        {/* Page Header Section */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+          ref={ref}
+          initial="hidden"
+          animate={inView ? 'visible' : 'hidden'}
+          variants={{
+            hidden: { opacity: 0, y: 20 },
+            visible: { opacity: 1, y: 0 },
+          }}
           className="text-center mb-16"
         >
           <h1 className="text-4xl sm:text-5xl font-bold mb-6">
@@ -42,14 +62,20 @@ const BlogPage = () => {
           </p>
         </motion.div>
 
+        {/* Posts Grid Section */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {posts.map((post, index) => (
             <motion.article
               key={post.title}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
+              initial="hidden"
+              animate={inView ? 'visible' : 'hidden'}
+              variants={{
+                hidden: { opacity: 0, y: 20 },
+                visible: { opacity: 1, y: 0 },
+              }}
               transition={{ delay: index * 0.2 }}
-              className="card-gradient rounded-xl overflow-hidden"
+              ref={ref}
+              className="card-gradient rounded-xl overflow-hidden transform transition-all duration-500 hover:scale-105 hover:shadow-lg"
             >
               <img
                 src={post.image}
@@ -77,7 +103,7 @@ const BlogPage = () => {
             </motion.article>
           ))}
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };

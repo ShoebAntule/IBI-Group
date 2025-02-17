@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Shield, Lock, Search, FileCheck } from 'lucide-react';
 
@@ -25,20 +26,44 @@ const solutions = [
 ];
 
 const SolutionsPage = () => {
+  // Intersection Observer callback to manage visibility
+  const observeVisibility = (element) => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('opacity-100', 'transform', 'translate-y-0');
+            entry.target.classList.remove('opacity-0', 'translate-y-5');
+          } else {
+            entry.target.classList.add('opacity-0', 'translate-y-5');
+            entry.target.classList.remove('opacity-100', 'translate-y-0');
+          }
+        });
+      },
+      { threshold: 0.5 } // 50% of the element should be visible
+    );
+
+    observer.observe(element);
+  };
+
+  useEffect(() => {
+    const elements = document.querySelectorAll('.fade-in-out');
+    elements.forEach((element) => observeVisibility(element));
+  }, []);
+
   return (
     <div className="pt-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-16"
+          className="text-center mb-16 fade-in-out opacity-0 transform translate-y-5 transition-all duration-1000 ease-in-out"
         >
           <h1 className="text-4xl sm:text-5xl font-bold mb-6">
             Our <span className="gradient-text">Solutions</span>
           </h1>
           <p className="text-gray-400 max-w-2xl mx-auto text-lg">
-            Cutting-edge cybersecurity solutions designed to protect your business
-            in an ever-evolving threat landscape.
+            Cutting-edge cybersecurity solutions designed to protect your business in an ever-evolving threat landscape.
           </p>
         </motion.div>
 
@@ -49,7 +74,8 @@ const SolutionsPage = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.2 }}
-              className="card-gradient p-6 rounded-xl"
+              className="card-gradient p-6 rounded-xl fade-in-out opacity-0 transform translate-y-5 transition-all duration-1000 ease-in-out"
+              ref={(el) => el && observeVisibility(el)}
             >
               <solution.icon className="w-12 h-12 text-blue-400 mb-4" />
               <h3 className="text-xl font-semibold mb-3">{solution.title}</h3>
